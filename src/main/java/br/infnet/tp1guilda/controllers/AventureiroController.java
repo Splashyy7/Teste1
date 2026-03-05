@@ -26,4 +26,11 @@ public class AventureiroController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(mapperAventureiro.toResponse(salvo));
     }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Aventureiro> buscarPorId(@PathVariable Long id) {
+        Aventureiro aventureiro = serviceAventureiro.buscarPorId(id);
+        return ResponseEntity.ok(aventureiro);
+    }
+
 }

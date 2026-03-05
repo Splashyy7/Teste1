@@ -11,6 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface RepositoryAventureiro {
+
+
     List<Aventureiro> findAll();
 
     List<Aventureiro> findWithFilter(FilterRequestAventureiro filtro);
