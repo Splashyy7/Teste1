@@ -33,4 +33,12 @@ public class AventureiroController {
         return ResponseEntity.ok(aventureiro);
     }
 
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<ResponseAventureiro> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody AtualizarAventureiro update
+    ) {
+        Aventureiro atualizado = serviceAventureiro.atualizar(id, update);
+        return ResponseEntity.ok(mapperAventureiro.toResponse(atualizado));
+    }
 }
