@@ -4,12 +4,18 @@ import br.infnet.tp1guilda.service.ServiceAventureiro;
 import br.infnet.tp1guilda.dto.*;
 import br.infnet.tp1guilda.mapper.*;
 import br.infnet.tp1guilda.models.Aventureiro;
+import br.infnet.tp1guilda.enums.Classe;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +33,33 @@ public class AventureiroController {
                 .body(mapperAventureiro.toResponse(salvo));
     }
 
+    @GetMapping
+    public ResponseEntity<List<ResponseAventureiro>> listar(
+            @RequestParam(required = false) Classe classe,
+            @RequestParam(required = false) Boolean ativo,
+            @RequestParam(required = false) @Min(value = 1, message = "O nível deve ser maior ou igual a 1") Integer nivelMinimo,
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "A página deve iniciar em 0") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Size deve ser entre 1 e 50") @Max(value = 50, message = "Size deve ser entre 1 e 50") int size
+    ) {
+        FilterRequestAventureiro filtro = new FilterRequestAventureiro(classe, ativo, nivelMinimo);
+        PageResult<Aventureiro> resultado = serviceAventureiro.listar(filtro, page, size);
+
+        List<ResponseAventureiro> response = resultado.content()
+                .stream()
+                .map(mapperAventureiro::toResponse)
+                .toList();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(resultado.total()));
+        headers.add("X-Page", String.valueOf(resultado.page()));
+        headers.add("X-Size", String.valueOf(resultado.size()));
+        headers.add("X-Total-Pages", String.valueOf(resultado.totalPages()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(response);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<Aventureiro> buscarPorId(@PathVariable Long id) {
         Aventureiro aventureiro = serviceAventureiro.buscarPorId(id);
@@ -40,5 +73,23 @@ public class AventureiroController {
     ) {
         Aventureiro atualizado = serviceAventureiro.atualizar(id, update);
         return ResponseEntity.ok(mapperAventureiro.toResponse(atualizado));
+    }
+
+    @PatchMapping(value = "/{id}/encerrar-vinculo")
+    public ResponseEntity<ResponseAventureiro> encerrarVinculo(@PathVariable Long id) {
+        Aventureiro aventureiro = serviceAventureiro.encerrarVinculo(id);
+        return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
+    }
+
+    @PatchMapping(value = "/{id}/recrutar")
+    public ResponseEntity<ResponseAventureiro> recrutarNovamente(@PathVariable Long id) {
+        Aventureiro aventureiro = serviceAventureiro.recrutarNovamente(id);
+        return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
+    }
+
+    @PatchMapping(value = "/{id}/remover-companheiro")
+    public ResponseEntity<ResponseAventureiro> removerCompanheiro(@PathVariable Long id) {
+        Aventureiro aventureiro = serviceAventureiro.removerCompanheiro(id);
+        return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
     }
 }

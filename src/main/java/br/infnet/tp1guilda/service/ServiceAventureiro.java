@@ -6,6 +6,8 @@ import br.infnet.tp1guilda.exceptions.AventureiroNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import br.infnet.tp1guilda.dto.AtualizarAventureiro;
+import br.infnet.tp1guilda.dto.FilterRequestAventureiro;
+import br.infnet.tp1guilda.dto.PageResult;
 
 @Service
 @RequiredArgsConstructor
@@ -36,5 +38,27 @@ public class ServiceAventureiro {
             aventureiro.alterarNivel(update.nivel());
 
         return repositoryAventureiro.save(aventureiro);
+    }
+
+    public Aventureiro encerrarVinculo(Long id) {
+        Aventureiro aventureiro = buscarPorId(id);
+        aventureiro.encerrarVinculo();
+        return repositoryAventureiro.save(aventureiro);
+    }
+
+    public Aventureiro recrutarNovamente(Long id) {
+        Aventureiro aventureiro = buscarPorId(id);
+        aventureiro.recrutar();
+        return repositoryAventureiro.save(aventureiro);
+    }
+
+    public Aventureiro removerCompanheiro(Long id) {
+        Aventureiro aventureiro = buscarPorId(id);
+        aventureiro.removerCompanheiro();
+        return repositoryAventureiro.save(aventureiro);
+    }
+
+    public PageResult<Aventureiro> listar(FilterRequestAventureiro filtro, int page, int size) {
+        return repositoryAventureiro.findWithFilter(filtro, page, size);
     }
 }
