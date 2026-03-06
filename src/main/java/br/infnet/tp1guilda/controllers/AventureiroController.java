@@ -87,6 +87,15 @@ public class AventureiroController {
         return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
     }
 
+    @PutMapping(value = "/{id}/companheiro")
+    public ResponseEntity<ResponseAventureiro> definirCompanheiro(
+            @PathVariable Long id,
+            @Valid @RequestBody DefinirCompanheiro dto
+    ) {
+        Aventureiro aventureiro = serviceAventureiro.definirCompanheiro(id, dto);
+        return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
+    }
+
     @PatchMapping(value = "/{id}/remover-companheiro")
     public ResponseEntity<ResponseAventureiro> removerCompanheiro(@PathVariable Long id) {
         Aventureiro aventureiro = serviceAventureiro.removerCompanheiro(id);
